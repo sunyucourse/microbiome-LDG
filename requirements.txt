@@ -1,0 +1,8 @@
+pandas==2.3.1
+scipy==1.15.0
+statsmodels==0.14.6
+numpy
+matplotlib
+seaborn
+openpyxl
+biom-format

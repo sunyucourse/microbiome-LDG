@@ -1,0 +1,58 @@
+{
+ "urban_built": {
+  "n": 38,
+  "R2_full": 0.1416,
+  "shares": {
+   "lat_abs": 0.0257,
+   "log_pop": 0.0176,
+   "log_gdp": 0.019,
+   "sanit_basic": 0.0759
+  },
+  "VIF": {
+   "lat_abs": 1.36,
+   "log_pop": 1.26,
+   "log_gdp": 2.48,
+   "sanit_basic": 2.64
+  },
+  "pvals": {
+   "lat_abs": 0.1764,
+   "log_pop": 0.259,
+   "log_gdp": 0.6516,
+   "sanit_basic": 0.076
+  },
+  "betas": {
+   "lat_abs": 3.2019,
+   "log_pop": 54.7011,
+   "log_gdp": 41.6992,
+   "sanit_basic": -7.129
+  }
+ },
+ "wastewater": {
+  "n": 217,
+  "R2_full": 0.0824,
+  "shares": {
+   "lat_abs": 0.0111,
+   "log_pop": 0.0072,
+   "log_gdp": 0.0071,
+   "sanit_basic": 0.0568
+  },
+  "VIF": {
+   "lat_abs": 1.5,
+   "log_pop": 1.2,
+   "log_gdp": 2.11,
+   "sanit_basic": 1.69
+  },
+  "pvals": {
+   "lat_abs": 0.149,
+   "log_pop": 0.2825,
+   "log_gdp": 0.1404,
+   "sanit_basic": 0.0006
+  },
+  "betas": {
+   "lat_abs": -2.6369,
+   "log_pop": -28.4483,
+   "log_gdp": 89.135,
+   "sanit_basic": -8.9841
+  }
+ }
+}

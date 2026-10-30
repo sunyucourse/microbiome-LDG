@@ -1,0 +1,109 @@
+# habitat_mapping_LDG.tsv — MicrobeAtlas raw environment annotations -> 12 LDG habitat categories
+# Manuscript: "Habitat-specific latitudinal diversity gradients in the global microbiome" (v2)
+# Date prepared: 2026-10-27
+#
+# SOURCE: MicrobeAtlas file samples.env.info.tsv, column "Environments"
+# (https://microbeatlas.org/downloads/samples/samples.env.info.tsv, accessed 2026-10-26).
+# The Environments field holds pipe-separated two-level strings "main_env;sub_env",
+# e.g. "soil;field|animal;human". One row below = one distinct main;sub pair observed
+# in the database (65 pairs), with n_samples = number of samples carrying that pair
+# (a sample carrying several pairs contributes to several rows; pair-assignments total 1,636,100).
+#
+# ASSIGNMENT RULES (exactly as implemented in the analysis; applied per sample over the
+# SET of its pairs, plus two side channels: the "f3" field and the "Keywords" field):
+#   soil:      sub in {agricultural,farm} -> soil_agricultural
+#              sub in {forest,field,tundra,shrub,desert} -> soil_natural
+#   aquatic:   sub == waste water -> wastewater
+#              sub in {river,lake,reservoir} -> freshwater
+#              sub == sediment -> marine_sediment IF pair co-occurs with marine/sea/ocean
+#                  OR with none of {river,lake,reservoir,waste water,estuary}
+#              sub in {marine,sea,ocean} (and no sediment) -> marine_planktonic
+#   plant:     sub == rhizosphere -> plant_rhizosphere
+#              sub in {leaf,flower,stem,sprout} -> plant_phyllosphere
+#   animal:    gut indication (f3 contains 'gut'/'gastric', or Keywords match
+#              fecal|faecal|feces|stool|intestin): human -> human_gut, else -> animal_gut
+#              skin indication (f3 contains 'skin'), non-human -> animal_skin
+#   urban_built: KEYWORD-DRIVEN ONLY (any env pair): Keywords match
+#              urban|subway|built environment|indoor|household|office|classroom|hospital|sewage
+#
+# MULTI-LABEL HANDLING: a sample receives EVERY applicable habitat label (its labels are
+# joined with "|" in qc_sample_metadata.csv). In grid aggregation each sample was counted
+# once in EACH of its habitats (pandas explode). Consequently the per-habitat sample counts
+# in Table 1 of the manuscript sum to 360,868 assignments while unique samples = 352,941.
+# Example: "soil;field|animal;human" with gut keywords enters BOTH soil_natural and human_gut.
+#
+# UNCLASSIFIED pairs (habitat_LDG = "(unclassified)") were NOT used: e.g. soil;peatland,
+# soil;paddy, aquatic;estuary, aquatic;groundwater, aquatic;ice, aquatic;brine,
+# plant;wood, plant;seed.
+#
+# ADDITIONAL SAMPLE FILTERS applied downstream (not part of this mapping):
+# experimental-treatment keyword blacklists (tier1/tier2, see manuscript Methods),
+# valid coordinates, recomputed Good's coverage >= 0.90 on mapped reads, and
+# >= 3 samples per 1x1-degree grid cell per habitat.
+env_pair	main_env	sub_env	n_samples	habitat_LDG	note
+animal;human	animal	human	473574	human_gut**	assigned to human_gut ONLY when f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; otherwise unused
+animal;mouse	animal	mouse	119563	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+aquatic;marine	aquatic	marine	109435	marine_planktonic	
+plant;rhizosphere	plant	rhizosphere	83097	plant_rhizosphere	
+soil;forest	soil	forest	71555	soil_natural	
+soil;field	soil	field	70999	soil_natural	
+aquatic;sediment	aquatic	sediment	68027	marine_sediment*	assigned to marine_sediment only if pair co-occurs with marine/sea/ocean OR with none of river/lake/reservoir/waste water/estuary; estuary;sediment-type combinations were excluded
+aquatic;sea	aquatic	sea	67431	marine_planktonic	
+aquatic;river	aquatic	river	54596	freshwater	
+aquatic;lake	aquatic	lake	49034	freshwater	
+aquatic;waste water	aquatic	waste water	42427	wastewater	
+animal;pig	animal	pig	36173	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+plant;leaf	plant	leaf	35093	plant_phyllosphere	
+animal;cattle	animal	cattle	34124	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+aquatic;ocean	aquatic	ocean	30579	marine_planktonic	
+soil;agricultural	soil	agricultural	29873	soil_agricultural	
+plant;wood	plant	wood	23054	(unclassified)	not used in the 12-habitat analysis
+animal;bird	animal	bird	22767	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+soil;farm	soil	farm	22060	soil_agricultural	
+animal;fish	animal	fish	19370	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;dog	animal	dog	13955	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;rat	animal	rat	12721	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+aquatic;estuary	aquatic	estuary	11221	(unclassified)	not used in the 12-habitat analysis
+soil;tundra	soil	tundra	9865	soil_natural	
+soil;shrub	soil	shrub	8566	soil_natural	
+soil;desert	soil	desert	7962	soil_natural	
+animal;bee	animal	bee	7953	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;mosquito	animal	mosquito	7362	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+soil;peatland	soil	peatland	7325	(unclassified)	not used in the 12-habitat analysis
+soil;paddy	soil	paddy	7150	(unclassified)	not used in the 12-habitat analysis
+plant;seed	plant	seed	6223	(unclassified)	not used in the 12-habitat analysis
+animal;horse	animal	horse	5935	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;macaque	animal	macaque	5911	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+aquatic;groundwater	aquatic	groundwater	5845	(unclassified)	not used in the 12-habitat analysis
+animal;bat	animal	bat	5662	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+aquatic;reservoir	aquatic	reservoir	5556	freshwater	
+animal;sheep	animal	sheep	4955	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+plant;stem	plant	stem	4688	plant_phyllosphere	
+animal;tick	animal	tick	4339	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+plant;flower	plant	flower	3702	plant_phyllosphere	
+aquatic;ice	aquatic	ice	3603	(unclassified)	not used in the 12-habitat analysis
+animal;termite	animal	termite	3402	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;zebrafish	animal	zebrafish	2570	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;cat	animal	cat	2503	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;bumblebee	animal	bumblebee	2484	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;goat	animal	goat	2214	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;fly	animal	fly	1762	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;baboon	animal	baboon	1296	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;hamster	animal	hamster	1122	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;swallow	animal	swallow	861	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;chimpanzee	animal	chimpanzee	798	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+aquatic;brine	aquatic	brine	728	(unclassified)	not used in the 12-habitat analysis
+animal;whale	animal	whale	603	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;pigeon	animal	pigeon	565	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;tadpole	animal	tadpole	527	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;sparrow	animal	sparrow	345	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;shark	animal	shark	320	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+plant;sprout	plant	sprout	237	plant_phyllosphere	
+animal;dolphin	animal	dolphin	174	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;gorilla	animal	gorilla	87	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;roe	animal	roe	75	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;seagull	animal	seagull	64	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;eagle	animal	eagle	27	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;stork	animal	stork	4	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+animal;fruitfly	animal	fruitfly	2	animal_gut** / animal_skin**	animal_gut if f3 contains 'gut'/'gastric' or Keywords match fecal|faecal|feces|stool|intestin; animal_skin if f3 contains 'skin'; otherwise unused
+(keyword-driven, independent of env pair)	(any)	(any)		urban_built	assigned when Keywords match: urban|subway|built environment|indoor|household|office|classroom|hospital|sewage
