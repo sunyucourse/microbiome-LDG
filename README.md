@@ -1,5 +1,5 @@
 # Habitat-specific latitudinal diversity gradients in the global microbiome
-
+[![DOI](https:,//zenodo.org/badge/DOI/10.5281/zenodo.23809610.svg,)](https://doi.org/10.5281/zenodo.23809610)
 Analysis code and derived data for the manuscript:
 
 > Sun Y, Fu X. Habitat-specific latitudinal diversity gradients in the global microbiome. (submitted)
